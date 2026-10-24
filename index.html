@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuiz Penjodoh Bilangan Tahun 5</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Comic Sans MS", "Trebuchet MS", Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff3a3, #a8f0c6, #9ed8ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #263238;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+      overflow: hidden;
+      border: 5px solid #ffcc4d;
+    }
+
+    header {
+      background: linear-gradient(90deg, #ffcc4d, #ff8a65);
+      padding: 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: #fff;
+      text-shadow: 2px 2px 0 #d35400;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #fffaf0;
+      font-weight: bold;
+    }
+
+    .mascot-row {
+      font-size: 2.6rem;
+      margin-top: 12px;
+      animation: bounce 1.8s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    main {
+      padding: 28px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .start-card, .quiz-card, .end-card {
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #e1f5fe;
+      color: #0277bd;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 8px;
+    }
+
+    .btn-primary {
+      background: #4caf50;
+      color: white;
+      box-shadow: 0 5px 0 #2e7d32;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 #2e7d32;
+    }
+
+    .btn-secondary {
+      background: #29b6f6;
+      color: white;
+      box-shadow: 0 5px 0 #0277bd;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 #0277bd;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .stat-box {
+      background: #fff8e1;
+      border: 3px dashed #ffca28;
+      border-radius: 18px;
+      padding: 12px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      background: #f1f8e9;
+      border: 4px solid #8bc34a;
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .question-number {
+      color: #558b2f;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .sentence {
+      font-size: 1.6rem;
+      font-weight: bold;
+      line-height: 1.45;
+      color: #37474f;
+    }
+
+    .hint {
+      margin-top: 10px;
+      color: #607d8b;
+      font-style: italic;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .choice-btn {
+      background: #ffffff;
+      border: 3px solid #90caf9;
+      border-radius: 18px;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.18s;
+      color: #263238;
+    }
+
+    .choice-btn:hover {
+      background: #e3f2fd;
+      transform: scale(1.02);
+    }
+
+    .choice-btn.correct {
+      background: #c8e6c9;
+      border-color: #2e7d32;
+      color: #1b5e20;
+    }
+
+    .choice-btn.wrong {
+      background: #ffcdd2;
+      border-color: #c62828;
+      color: #b71c1c;
+    }
+
+    .choice-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .feedback {
+      min-height: 70px;
+      margin-top: 18px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .feedback.good {
+      color: #2e7d32;
+    }
+
+    .feedback.bad {
+      color: #c62828;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 18px;
+      background: #e0e0e0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 2px solid #bdbdbd;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #66bb6a, #ffee58);
+      transition: width 0.3s;
+    }
+
+    .review {
+      text-align: left;
+      margin-top: 20px;
+      background: #fafafa;
+      border-radius: 18px;
+      padding: 18px;
+      border: 2px solid #eeeeee;
+    }
+
+    .review h3 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .review-item {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .small-note {
+      margin-top: 18px;
+      font-size: 0.9rem;
+      color: #607d8b;
+    }
+
+    .star {
+      font-size: 2.4rem;
+      animation: spin 1.2s ease-in-out;
+      display: inline-block;
+      margin: 4px;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg) scale(0.5); opacity: 0; }
+      to { transform: rotate(360deg) scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 650px) {
+      header h1 {
+        font-size: 1.45rem;
+      }
+
+      .sentence {
+        font-size: 1.25rem;
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-container">
+    <header>
+      <h1>Kuiz Penjodoh Bilangan Tahun 5</h1>
+      <p>Inspirasi kawan-kawan haiwan ceria yang suka belajar bersama!</p>
+      <div class="mascot-row">🐥 🐱 🐐 🐘 🎵</div>
+    </header>
+
+    <main>
+      <!-- START SCREEN -->
+      <section id="startScreen" class="screen active">
+        <div class="start-card">
+          <div class="badge">Bahasa Melayu Tahun 5</div>
+          <h2>Jom Bantu Kawan Ceria Pilih Penjodoh Bilangan!</h2>
+          <p>
+            Pilih jawapan yang paling tepat bagi setiap ayat.
+            Kumpul markah dan cuba dapatkan semua bintang!
+          </p>
+
+          <button class="btn btn-primary" onclick="startGame()">Mula Bermain</button>
+
+          <p class="small-note">
+            Nota: Permainan ini menggunakan tema haiwan ceria yang diinspirasikan,
+            tanpa menggunakan aset rasmi mana-mana rancangan.
+          </p>
+        </div>
+      </section>
+
+      <!-- QUIZ SCREEN -->
+      <section id="quizScreen" class="screen">
+        <div class="quiz-card">
+          <div class="stats">
+            <div class="stat-box">Soalan: <span id="questionCounter">1/10</span></div>
+            <div class="stat-box">Markah: <span id="scoreText">0</span></div>
+            <div class="stat-box">Betul: <span id="correctText">0</span></div>
+          </div>
+
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+
+          <div class="question-box">
+            <div id="questionNumber" class="question-number">Soalan 1</div>
+            <div id="sentence" class="sentence"></div>
+            <div class="hint">Pilih penjodoh bilangan yang sesuai.</div>
+          </div>
+
+          <div id="choices" class="choices"></div>
+
+          <div id="feedback" class="feedback"></div>
+
+          <button id="nextBtn" class="btn btn-secondary" onclick="nextQuestion()" style="display:none;">
+            Soalan Seterusnya
+          </button>
+        </div>
+      </section>
+
+      <!-- END SCREEN -->
+      <section id="endScreen" class="screen">
+        <div class="end-card">
+          <div class="badge">Keputusan</div>
+          <h2>Tahniah! Permainan Tamat 🎉</h2>
+
+          <div id="stars"></div>
+
+          <h3>Markah Akhir: <span id="finalScore">0</span></h3>
+          <p>Jawapan betul: <span id="finalCorrect">0</span> daripada <span id="finalTotal">10</span></p>
+          <p id="finalMessage"></p>
+
+          <button class="btn btn-primary" onclick="startGame()">Main Lagi</button>
+          <button class="btn btn-secondary" onclick="goHome()">Kembali ke Mula</button>
+
+          <div id="review" class="review"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const allQuestions = [
+      {
+        sentence: "Di reban, Koko melihat tiga ___ ayam.",
+        answer: "ekor",
+        choices: ["ekor", "batang", "helai", "biji"],
+        explain: "Haiwan seperti ayam, kucing dan ikan menggunakan penjodoh bilangan 'ekor'."
+      },
+      {
+        sentence: "Mimi membeli dua ___ pensel warna di kedai.",
+        answer: "batang",
+        choices: ["batang", "buah", "keping", "ulas"],
+        explain: "Pensel ialah benda yang panjang, maka penjodoh bilangannya ialah 'batang'."
+      },
+      {
+        sentence: "Ayah membawa sebuah bakul berisi lima ___ telur.",
+        answer: "biji",
+        choices: ["helai", "biji", "pucuk", "utas"],
+        explain: "Telur menggunakan penjodoh bilangan 'biji'."
+      },
+      {
+        sentence: "Lili melukis gambar pada se___ kertas putih.",
+        answer: "helai",
+        choices: ["helai", "ekor", "buah", "bilah"],
+        explain: "Kertas, baju dan daun biasanya menggunakan penjodoh bilangan 'helai'."
+      },
+      {
+        sentence: "Dina makan dua ___ roti semasa sarapan.",
+        answer: "keping",
+        choices: ["keping", "tandan", "ekor", "pucuk"],
+        explain: "Roti yang leper atau dipotong nipis menggunakan penjodoh bilangan 'keping'."
+      },
+      {
+        sentence: "Kawan-kawan ceria tinggal di se___ rumah kecil yang cantik.",
+        answer: "buah",
+        choices: ["buah", "ulas", "bilah", "utas"],
+        explain: "Rumah, kereta dan bangunan menggunakan penjodoh bilangan 'buah'."
+      },
+      {
+        sentence: "Nenek menggunakan se___ pisau untuk memotong sayur.",
+        answer: "bilah",
+        choices: ["bilah", "kaki", "helai", "gugus"],
+        explain: "Pisau, parang dan keris menggunakan penjodoh bilangan 'bilah'."
+      },
+      {
+        sentence: "Posmen menghantar se___ surat kepada Cici.",
+        answer: "pucuk",
+        choices: ["pucuk", "biji", "pasang", "tandan"],
+        explain: "Surat menggunakan penjodoh bilangan 'pucuk'."
+      },
+      {
+        sentence: "Ibu membeli se___ pisang di pasar.",
+        answer: "tandan",
+        choices: ["tandan", "helai", "bilah", "ekor"],
+        explain: "Pisang yang banyak pada tangkai besar disebut 'tandan'."
+      },
+      {
+        sentence: "Adik makan se___ durian yang manis.",
+        answer: "ulas",
+        choices: ["ulas", "batang", "buah", "pucuk"],
+        explain: "Isi durian, bawang putih dan limau menggunakan penjodoh bilangan 'ulas'."
+      },
+      {
+        sentence: "Rara memakai se___ kasut baharu.",
+        answer: "pasang",
+        choices: ["pasang", "keping", "ekor", "bilah"],
+        explain: "Benda yang berpasangan seperti kasut, stoking dan sarung tangan menggunakan 'pasang'."
+      },
+      {
+        sentence: "Bapa mengikat kotak itu dengan se___ tali.",
+        answer: "utas",
+        choices: ["utas", "biji", "helai", "buah"],
+        explain: "Tali, rantai dan benang menggunakan penjodoh bilangan 'utas'."
+      },
+      {
+        sentence: "Tini memetik se___ bunga mawar di taman.",
+        answer: "kuntum",
+        choices: ["kuntum", "ekor", "kaki", "pucuk"],
+        explain: "Bunga menggunakan penjodoh bilangan 'kuntum'."
+      },
+      {
+        sentence: "Di atas meja ada se___ kek coklat.",
+        answer: "potong",
+        choices: ["potong", "tandan", "bilah", "utas"],
+        explain: "Kek, ayam atau daging yang telah dipotong menggunakan 'potong'."
+      },
+      {
+        sentence: "Paman membaca se___ majalah pendidikan.",
+        answer: "naskhah",
+        choices: ["naskhah", "ulas", "ekor", "biji"],
+        explain: "Majalah, akhbar dan buku tertentu boleh menggunakan penjodoh bilangan 'naskhah'."
+      },
+      {
+        sentence: "Di dapur terdapat se___ ais di dalam mangkuk.",
+        answer: "ketul",
+        choices: ["ketul", "helai", "pucuk", "pasang"],
+        explain: "Ais, batu dan daging yang berketul menggunakan penjodoh bilangan 'ketul'."
+      },
+      {
+        sentence: "Murid itu minum se___ air selepas bersukan.",
+        answer: "gelas",
+        choices: ["gelas", "ekor", "bilah", "tandan"],
+        explain: "Minuman dalam bekas gelas menggunakan penjodoh bilangan 'gelas'."
+      },
+      {
+        sentence: "Ibu membeli se___ nasi lemak untuk sarapan.",
+        answer: "bungkus",
+        choices: ["bungkus", "kaki", "utas", "helai"],
+        explain: "Makanan yang dibungkus menggunakan penjodoh bilangan 'bungkus'."
+      },
+      {
+        sentence: "Atuk membawa se___ payung ketika hujan.",
+        answer: "kaki",
+        choices: ["kaki", "ekor", "pucuk", "ulas"],
+        explain: "Payung menggunakan penjodoh bilangan 'kaki'."
+      },
+      {
+        sentence: "Cici melihat se___ anggur di dalam bakul.",
+        answer: "gugus",
+        choices: ["gugus", "bilah", "batang", "pasang"],
+        explain: "Anggur yang berkumpulan menggunakan penjodoh bilangan 'gugus'."
+      }
+    ];
+
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let correct = 0;
+    let answered = false;
+    let reviewList = [];
+
+    const totalQuestions = 10;
+
+    function shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.remove("active");
+      });
+      document.getElementById(screenId).classList.add("active");
+    }
+
+    function startGame() {
+      questions = shuffleArray(allQuestions).slice(0, totalQuestions);
+      currentIndex = 0;
+      score = 0;
+      correct = 0;
+      answered = false;
+      reviewList = [];
+
+      showScreen("quizScreen");
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      answered = false;
+
+      const q = questions[currentIndex];
+      const shuffledChoices = shuffleArray(q.choices);
+
+      document.getElementById("questionCounter").textContent = `${currentIndex + 1}/${totalQuestions}`;
+      document.getElementById("scoreText").textContent = score;
+      document.getElementById("correctText").textContent = correct;
+      document.getElementById("questionNumber").textContent = `Soalan ${currentIndex + 1}`;
+      document.getElementById("sentence").textContent = q.sentence;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("nextBtn").style.display = "none";
+
+      const progress = ((currentIndex) / totalQuestions) * 100;
+      document.getElementById("progressFill").style.width = progress + "%";
+
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = "";
+
+      shuffledChoices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.textContent = choice;
+        btn.onclick = () => checkAnswer(btn, choice);
+        choicesDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(button, selected) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[currentIndex];
+      const feedback = document.getElementById("feedback");
+      const buttons = document.querySelectorAll(".choice-btn");
+
+      buttons.forEach(btn => {
+        btn.disabled = true;
+
+        if (btn.textContent === q.answer) {
+          btn.classList.add("correct");
+        }
+
+        if (btn.textContent === selected && selected !== q.answer) {
+          btn.classList.add("wrong");
+        }
+      });
+
+      if (selected === q.answer) {
+        correct++;
+        score += 10;
+        feedback.textContent = `Betul! Jawapannya ialah "${q.answer}". ${q.explain}`;
+        feedback.classList.add("good");
+      } else {
+        feedback.textContent = `Cuba lagi nanti. Jawapan yang betul ialah "${q.answer}". ${q.explain}`;
+        feedback.classList.add("bad");
+      }
+
+      reviewList.push({
+        sentence: q.sentence,
+        selected: selected,
+        answer: q.answer,
+        correct: selected === q.answer,
+        explain: q.explain
+      });
+
+      document.getElementById("scoreText").textContent = score;
+      document.getElementById("correctText").textContent = correct;
+
+      if (currentIndex === totalQuestions - 1) {
+        document.getElementById("nextBtn").textContent = "Lihat Keputusan";
+      } else {
+        document.getElementById("nextBtn").textContent = "Soalan Seterusnya";
+      }
+
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+
+      if (currentIndex >= totalQuestions) {
+        endGame();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function endGame() {
+      document.getElementById("progressFill").style.width = "100%";
+      showScreen("endScreen");
+
+      document.getElementById("finalScore").textContent = score;
+      document.getElementById("finalCorrect").textContent = correct;
+      document.getElementById("finalTotal").textContent = totalQuestions;
+
+      const starsDiv = document.getElementById("stars");
+      starsDiv.innerHTML = "";
+
+      let starCount = 1;
+      if (correct >= 8) starCount = 3;
+      else if (correct >= 5) starCount = 2;
+
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement("span");
+        star.className = "star";
+        star.textContent = "⭐";
+        starsDiv.appendChild(star);
+      }
+
+      const finalMessage = document.getElementById("finalMessage");
+
+      if (correct >= 9) {
+        finalMessage.textContent = "Hebat! Kamu sangat mahir menggunakan penjodoh bilangan.";
+      } else if (correct >= 6) {
+        finalMessage.textContent = "Bagus! Teruskan latihan untuk menjadi lebih mantap.";
+      } else {
+        finalMessage.textContent = "Jangan putus asa. Cuba main lagi dan baca penerangan jawapan.";
+      }
+
+      renderReview();
+    }
+
+    function renderReview() {
+      const review = document.getElementById("review");
+      review.innerHTML = "<h3>Ulang Kaji Jawapan</h3>";
+
+      reviewList.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "review-item";
+
+        div.innerHTML = `
+          <strong>${index + 1}. ${item.sentence}</strong><br>
+          Jawapan kamu: 
+          <span style="color:${item.correct ? '#2e7d32' : '#c62828'}; font-weight:bold;">
+            ${item.selected}
+          </span><br>
+          Jawapan betul: <strong>${item.answer}</strong><br>
+          <em>${item.explain}</em>
+        `;
+
+        review.appendChild(div);
+      });
+    }
+
+    function goHome() {
+      showScreen("startScreen");
+    }
+  </script>
+</body>
+</html>
